@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad 4 UMCE-SENADIS: Enseñanza y Evaluación</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-emerald: #065f46;
+            --secondary-teal: #0d9488;
+            --accent-navy: #1e3a8a;
+            --text-dark: #1e293b;
+            --bg-white: rgba(255, 255, 255, 0.98);
+        }
+
+        /* FONDO ANIMADO ESMERALDA */
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #064e3b 0%, #0d9488 50%, #1e3a8a 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: var(--text-dark);
+            margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* ENCABEZADO */
+        .header-nav { background: rgba(255, 255, 255, 0.95); border-bottom: 6px solid var(--secondary-teal); padding: 1.5rem; text-align: center; }
+        .header-nav h1 { margin: 0; font-size: 1.8rem; font-weight: 800; color: var(--primary-emerald); }
+        .header-nav p { margin: 8px 0 0 0; font-size: 0.9rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 1px; }
+
+        .main-container { max-width: 850px; margin: 2rem auto; padding: 0 1rem 4rem 1rem; }
+
+        /* PROGRESO */
+        .progress-box { background: var(--bg-white); border-radius: 15px; padding: 1.2rem; margin-bottom: 1.5rem; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .progress-label { display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 800; color: var(--primary-emerald); margin-bottom: 8px; }
+        .progress-bar { width: 100%; height: 12px; background: #e2e8f0; border-radius: 6px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--secondary-teal); width: 0%; transition: width 0.6s ease; }
+
+        /* TARJETAS */
+        .screen { display: none; background: var(--bg-white); border-radius: 25px; padding: 2.5rem; box-shadow: 0 15px 35px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.3); }
+        .screen.active { display: block; animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* IMAGEN DE PORTADA NUEVA */
+        .cover-img { width: 100%; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+
+        .badge-tag { background: #d1fae5; color: var(--primary-emerald); padding: 6px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 800; display: inline-block; margin-bottom: 1rem; text-transform: uppercase; }
+
+        /* ELEMENTOS DE PREGUNTA */
+        .question-text { font-size: 1.2rem; font-weight: 700; color: var(--primary-emerald); line-height: 1.5; margin-bottom: 1.5rem; }
+        .options-container { display: grid; gap: 0.8rem; margin-top: 1rem; }
+        .option-btn { background: white; border: 2px solid #cbd5e1; padding: 1.2rem; border-radius: 15px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.2s; text-align: left; color: var(--text-dark); font-family: inherit; }
+        .option-btn:hover:not(:disabled) { border-color: var(--secondary-teal); background: #f0fdfa; transform: translateX(5px); }
+        .option-btn.selected { background: var(--secondary-teal); color: white; border-color: var(--primary-emerald); }
+
+        .feedback-box { margin-top: 1.5rem; padding: 1.5rem; border-radius: 15px; display: none; line-height: 1.7; border-left: 8px solid; font-size: 1.05rem; }
+        .fb-correct { background: #ecfdf5; border-color: #10b981; color: #065f46; }
+        .fb-wrong { background: #fff5f5; border-color: #f87171; color: #991b1b; }
+        .fb-neutral { background: #f0f9ff; border-color: #3b82f6; color: #1e3a8a; }
+
+        .btn-next { background: linear-gradient(135deg, var(--primary-emerald), var(--secondary-teal)); color: white; border: none; padding: 1.1rem 2.8rem; border-radius: 40px; font-size: 1.2rem; font-weight: 800; margin-top: 2rem; cursor: pointer; transition: 0.3s; display: block; width: fit-content; margin-left: auto; margin-right: auto; box-shadow: 0 6px 15px rgba(6, 95, 70, 0.3); }
+        .btn-next:hover { transform: scale(1.05); filter: brightness(1.1); }
+
+        @media (max-width: 600px) { .screen { padding: 1.5rem; } }
+    </style>
+</head>
+<body>
+
+    <header class="header-nav">
+        <h1>“Comprender para incluir”</h1>
+        <p>Enseñanza y evaluación en el aula - UMCE-SENADIS</p>
+    </header>
+
+    <div class="main-container">
+        <div class="progress-box">
+            <div class="progress-label"><span>Progreso de la actividad</span><span id="progress-text">0/9</span></div>
+            <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+        </div>
+
+        <div id="screen-intro" class="screen active">
+            <img src="https://i.postimg.cc/CKGt8W07/Gemini-Generated-Image-1nr19f1nr19f1nr1.png" alt="Portada Actividad 4" class="cover-img">
+            <span class="badge-tag">Módulo 2</span>
+            <h2>Propósito</h2>
+            <p style="font-size: 1.1rem; line-height: 1.6;">Analizar los componentes de las prácticas de enseñanza y evaluación en contextos educativos, desde distintas perspectivas.</p>
+            <div style="background: #f0fdf4; border-left: 6px solid var(--secondary-teal); padding: 1.5rem; border-radius: 12px; margin-top: 1.5rem;">
+                <strong>Instrucciones:</strong>
+                <p style="margin-top:8px;">Deberás identificar elementos de las prácticas de enseñanza/evaluación y analizar las decisiones pedagógicas implicadas a partir de tus propios criterios y comprensiones.</p>
+            </div>
+            <button class="btn-next" onclick="goTo('screen-q1')">Comenzar Desafío</button>
+        </div>
+
+        <div id="screen-q1" class="screen">
+            <span class="badge-tag">Nivel 1: Identificación</span>
+            <p class="question-text">1) Un docente aplica la misma prueba escrita a todo el curso, con tiempo limitado y sin posibilidad de ajustes, argumentando que así asegura la equidad. ¿Qué enfoque predomina?</p>
+            <div class="options-container">
+                <button class="option-btn" onclick="handle(1, 'A', 'correct')">A) La evaluación se entiende como medición estandarizada del aprendizaje.</button>
+                <button class="option-btn" onclick="handle(1, 'B', 'wrong')">B) Se ajustan las formas de evaluar considerando características y necesidades.</button>
+                <button class="option-btn" onclick="handle(1, 'C', 'neutral')">C) No estoy seguro/a.</button>
+            </div>
+            <div id="fb1" class="feedback-box"></div>
+            <button id="btn1" class="btn-next" style="display:none" onclick="goTo('screen-q2')">Siguiente Pregunta</button>
+        </div>
+
+        <div id="screen-q2" class="screen">
+            <span class="badge-tag">Nivel 1: Identificación</span>
+            <p class="question-text">2) En una clase, el docente explica el contenido únicamente de forma expositiva, sin generar instancias de participación ni interacción. ¿Qué característica predomina?</p>
+            <div class="options-container">
+                <button class="option-btn" onclick="handle(2, 'A', 'wrong')">A) Se promueve la participación activa mediante diversas formas de interacción.</button>
+                <button class="option-btn" onclick="handle(2, 'B', 'correct')">B) La enseñanza se organiza de manera homogénea, sin considerar distintas formas de acceso.</button>
+                <button class="option-btn" onclick="handle(2, 'C', 'neutral')">C) No estoy seguro/a.</button>
+            </div>
+            <div id="fb2" class="feedback-box"></div>
+            <button id="btn2" class="btn-next" style="display:none" onclick="goTo('screen-q3')">Siguiente Pregunta</button>
+        </div>
+
+        <div id="screen-q3" class="screen">
+            <span class="badge-tag">Nivel 1: Identificación</span>
+            <p class="question-text">3) En un curso diverso, el docente decide trabajar un mismo contenido utilizando videos, actividades prácticas, discusión en grupo y material escrito. ¿Qué principio se refleja?</p>
+            <div class="options-container">
+                <button class="option-btn" onclick="handle(3, 'A', 'correct')">A) Presentar el contenido de distintas maneras para facilitar el acceso y la comprensión.</button>
+                <button class="option-btn" onclick="handle(3, 'B', 'wrong')">B) Aumentar la cantidad de actividades para asegurar la cobertura del contenido.</button>
+                <button class="option-btn" onclick="handle(3, 'C', 'neutral')">C) No estoy seguro/a.</button>
+            </div>
+            <div id="fb3" class="feedback-box"></div>
+            <button id="btn3" class="btn-next" style="display:none" onclick="goTo('screen-q4')">Siguiente Pregunta</button>
+        </div>
+
+        <div id="screen-q4" class="screen">
+            <span class="badge-tag">Cierre de Fase</span>
+            <p class="question-text">4) En una enseñanza con enfoque inclusivo, ¿qué elemento orienta principalmente la práctica docente?</p>
+            <div class="options-container">
+                <button class="option-btn" onclick="handle(4, 'A', 'wrong')">A) Cubrir la totalidad del contenido planificado.</button>
+                <button class="option-btn" onclick="handle(4, 'B', 'correct')">B) Ajustar la enseñanza considerando cómo aprenden y participan los estudiantes.</button>
+                <button class="option-btn" onclick="handle(4, 'C', 'wrong')">C) Mantener una misma estrategia para todo el curso para asegurar orden.</button>
+                <button class="option-btn" onclick="handle(4, 'D', 'neutral')">D) No estoy seguro/a.</button>
+            </div>
+            <div id="fb4" class="feedback-box"></div>
+            <button id="btn4" class="btn-next" style="display:none" onclick="goTo('screen-case1')">Siguiente Nivel</button>
+        </div>
+
+        <div id="screen-case1" class="screen">
+            <span class="badge-tag">Nivel 1: Enfoques</span>
+            <p class="question-text">Caso: Un docente aplica la misma prueba a todo el curso sin considerar la diversidad ni el contexto de los estudiantes.</p>
+            <p><strong>Identifica el enfoque:</strong></p>
+            <div class="options-container">
+                <button class="option-btn" onclick="checkP2(1, 'Tradicional', true)">Evaluación tradicional</button>
+                <button class="option-btn" onclick="checkP2(1, 'Inclusiva', false)">Evaluación inclusiva-iluminativa</button>
+                <button class="option-btn" onclick="checkP2(1, 'Duda', null)">No estoy seguro/a</button>
+            </div>
+            <div id="fb-p2-1" class="feedback-box"></div>
+            <button id="btn-p2-1" class="btn-next" style="display:none" onclick="goTo('screen-case2')">Siguiente Caso</button>
+        </div>
+
+        <div id="screen-case2" class="screen">
+            <span class="badge-tag">Nivel 1: Enfoques</span>
+            <p class="question-text">Caso: Un docente recoge información sobre el contexto, las experiencias y las formas de participación para evaluar el aprendizaje.</p>
+            <p><strong>Identifica el enfoque:</strong></p>
+            <div class="options-container">
+                <button class="option-btn" onclick="checkP2(2, 'Tradicional', false)">Evaluación tradicional</button>
+                <button class="option-btn" onclick="checkP2(2, 'Inclusiva', true)">Evaluación inclusiva-iluminativa</button>
+                <button class="option-btn" onclick="checkP2(2, 'Duda', null)">No estoy seguro/a</button>
+            </div>
+            <div id="fb-p2-2" class="feedback-box"></div>
+            <button id="btn-p2-2" class="btn-next" style="display:none" onclick="goTo('screen-case3')">Pasar al Nivel 2</button>
+        </div>
+
+        <div id="screen-case3" class="screen">
+            <span class="badge-tag">Nivel 2: Decisiones</span>
+            <p class="question-text">Caso 3: Un estudiante presenta dificultades en una evaluación. ¿Qué acción se alinea con un enfoque inclusivo-iluminativo?</p>
+            <div class="options-container">
+                <button class="option-btn" onclick="checkN2(3, 'A', false)">Repetir la misma evaluación</button>
+                <button class="option-btn" onclick="checkN2(3, 'B', true)">Analizar las condiciones en que se realizó la evaluación</button>
+                <button class="option-btn" onclick="checkN2(3, 'C', false)">Asignar una calificación baja</button>
+            </div>
+            <div id="fb-n2-3" class="feedback-box"></div>
+            <button id="btn-n2-3" class="btn-next" style="display:none" onclick="goTo('screen-case4')">Siguiente Pregunta</button>
+        </div>
+
+        <div id="screen-case4" class="screen">
+            <span class="badge-tag">Nivel 2: Decisiones</span>
+            <p class="question-text">Caso 4: En un curso diverso, el docente decide incorporar múltiples formas de evaluación. ¿Qué concepto se relaciona más directamente?</p>
+            <div class="options-container">
+                <button class="option-btn" onclick="checkN2(4, 'A', false)">Integración</button>
+                <button class="option-btn" onclick="checkN2(4, 'B', true)">Diseño Universal</button>
+                <button class="option-btn" onclick="checkN2(4, 'C', false)">Diagnóstico clínico</button>
+            </div>
+            <div id="fb-n2-4" class="feedback-box"></div>
+            <button id="btn-n2-4" class="btn-next" style="display:none" onclick="goTo('screen-closure')">Finalizar</button>
+        </div>
+
+        <div id="screen-closure" class="screen">
+            <span class="badge-tag">Nivel 3: Cierre</span>
+            <p class="question-text">¿Qué elemento es más relevante en una evaluación inclusiva?</p>
+            <div class="options-container">
+                <button class="option-btn" onclick="finalCheck('Resultados')">Resultados</button>
+                <button class="option-btn" onclick="finalCheck('Contexto')">Contexto</button>
+                <button class="option-btn" onclick="finalCheck('Diagnóstico')">Diagnóstico</button>
+                <button class="option-btn" onclick="finalCheck('Estandarización')">Estandarización</button>
+            </div>
+            <div id="fb-final" class="feedback-box"></div>
+            <button id="btn-end" class="btn-next" style="display:none" onclick="goTo('screen-end')">Obtener Insignia</button>
+        </div>
+
+        <div id="screen-end" class="screen">
+            <div style="text-align: center;">
+                <span style="font-size: 6rem; display: block; margin-bottom: 1.5rem;">🎓</span>
+                <h2 style="color: var(--primary-emerald); margin-bottom: 10px;">¡Excelente trabajo!</h2>
+                <p style="font-size: 1.2rem;">Has obtenido la insignia:</p>
+                <p style="font-size: 1.6rem; font-weight: 800; color: var(--secondary-teal); margin: 15px 0;">“Maestro/a de la Evaluación Inclusiva”</p>
+                <div style="background: #f0fdfa; padding: 1.5rem; border-radius: 20px; border: 2px solid var(--secondary-teal); margin-top: 1.5rem;">
+                    <p style="margin: 0; font-weight: 700; color: var(--primary-emerald);">Has completado el análisis de prácticas pedagógicas y evaluación inclusiva.</p>
+                </div>
+                <p style="margin-top: 2rem; font-weight: 800; color: var(--primary-emerald);">UMCE-SENADIS 2026</p>
+            </div>
+        </div>
+    </div>
+
+<script>
+    let currentStep = 0;
+    const totalSteps = 9;
+
+    function goTo(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        const seq = ['screen-intro', 'screen-q1', 'screen-q2', 'screen-q3', 'screen-q4', 'screen-case1', 'screen-case2', 'screen-case3', 'screen-case4', 'screen-closure', 'screen-end'];
+        currentStep = seq.indexOf(id);
+        const progress = Math.min(Math.max(currentStep, 0), totalSteps);
+        document.getElementById('progress-fill').style.width = (progress / totalSteps * 100) + '%';
+        document.getElementById('progress-text').innerText = progress + '/' + totalSteps;
+        window.scrollTo(0,0);
+    }
+
+    const feedbacks = {
+        1: {
+            'correct': '<strong>Correcta:</strong> Esta alternativa refleja un enfoque tradicional de evaluación, centrado en la estandarización. Aunque se presenta como equitativa, no considera la diversidad, lo que puede generar barreras.',
+            'wrong': '<strong>Incorrecta:</strong> El caso no muestra ajustes. Esta opción describe una práctica inclusiva que no se está aplicando aquí.',
+            'neutral': '<strong>Válido:</strong> Es normal tener dudas. Reflexiona: ¿Qué significa evaluar considerando la diversidad?'
+        },
+        2: {
+            'correct': '<strong>Correcta:</strong> Esta práctica responde a una lógica tradicional (homogénea), asumiendo que todos aprenden igual, lo que limita la participación.',
+            'wrong': '<strong>Incorrecta:</strong> El caso no muestra participación activa, sino una clase puramente expositiva.',
+            'neutral': '<strong>Válido:</strong> Pregúntate: ¿Hay distintas formas de participar? Si no las hay, la práctica es homogénea.'
+        },
+        3: {
+            'correct': '<strong>Correcta:</strong> Diversificar recursos (videos, grupos, etc.) promueve múltiples formas de acceso, reduciendo barreras para el aprendizaje.',
+            'wrong': '<strong>Incorrecta:</strong> El objetivo no es la cantidad de contenido, sino la calidad del acceso mediante la diversidad.',
+            'neutral': '<strong>Válido:</strong> Piensa: ¿Por qué usar videos y grupos? Para que todos puedan comprender mejor.'
+        },
+        4: {
+            'correct': '<strong>Correcta:</strong> La enseñanza inclusiva se orienta por el ajuste pedagógico basado en cómo aprenden y participan los estudiantes.',
+            'wrong': '<strong>Incorrecta:</strong> Centrarse solo en el contenido o el orden deja fuera la realidad diversa del aula.',
+            'neutral': '<strong>Válido:</strong> ¿La enseñanza se adapta al estudiante o el estudiante a la enseñanza?'
+        }
+    };
+
+    function handle(q, opt, type) {
+        const fb = document.getElementById('fb' + q);
+        fb.innerHTML = feedbacks[q][type];
+        fb.className = 'feedback-box ' + (type === 'correct' ? 'fb-correct' : type === 'wrong' ? 'fb-wrong' : 'fb-neutral');
+        fb.style.display = 'block';
+        const btns = document.querySelectorAll(`#screen-q${q} .option-btn`);
+        btns.forEach(b => { b.disabled = true; if(b.innerText.startsWith(opt)) b.classList.add('selected'); });
+        document.getElementById('btn' + q).style.display = 'block';
+    }
+
+    function checkP2(id, type, isCorrect) {
+        const fb = document.getElementById('fb-p2-' + id);
+        const btns = document.querySelectorAll(`#screen-case${id} .option-btn`);
+        btns.forEach(b => b.disabled = true);
+        if(id === 1) {
+            fb.innerHTML = '<strong>Respuesta:</strong> Este enfoque no considera la diversidad ni el contexto. La evaluación inclusiva busca comprender procesos.';
+            fb.className = 'feedback-box ' + (type === 'Tradicional' ? 'fb-correct' : 'fb-neutral');
+        } else {
+            fb.innerHTML = '<strong>Respuesta:</strong> Este enfoque considera múltiples dimensiones y se centra en comprender más que en solo medir.';
+            fb.className = 'feedback-box ' + (type === 'Inclusiva' ? 'fb-correct' : 'fb-neutral');
+        }
+        fb.style.display = 'block';
+        document.getElementById('btn-p2-' + id).style.display = 'block';
+    }
+
+    function checkN2(id, opt, isCorrect) {
+        const fb = document.getElementById('fb-n2-' + id);
+        fb.className = 'feedback-box ' + (isCorrect ? 'fb-correct' : 'fb-neutral');
+        if(id === 3) fb.innerHTML = '<strong>Respuesta:</strong> La evaluación inclusiva busca comprender las condiciones que influyen en el aprendizaje, no solo los resultados.';
+        else fb.innerHTML = '<strong>Respuesta:</strong> El Diseño Universal permite generar múltiples formas de participación y evaluación.';
+        fb.style.display = 'block';
+        document.getElementById('btn-n2-' + id).style.display = 'block';
+        const btns = document.querySelectorAll(`#screen-case${id} .option-btn`);
+        btns.forEach(b => b.disabled = true);
+    }
+
+    function finalCheck(choice) {
+        const fb = document.getElementById('fb-final');
+        fb.className = 'feedback-box fb-correct';
+        fb.innerHTML = '<strong>Respuesta:</strong> Comprender el contexto permite interpretar resultados y tomar decisiones pedagógicas inclusivas.';
+        fb.style.display = 'block';
+        document.getElementById('btn-end').style.display = 'block';
+        const btns = document.querySelectorAll('#screen-closure .option-btn');
+        btns.forEach(b => b.disabled = true);
+    }
+</script>
+</body>
+</html>
